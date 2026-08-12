@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.4
+
+- Hosted checkout return-to-merchant: WebView completes on `returnUrl` navigation
+  (`intentId`, `sessionId`, `status` query params) and via `qattapay:success` /
+  `qattapay:cancel` JS bridge backup
+- Treat `status=cancel|failed` on the return URL as cancel
+- Docs: clarify that `returnUrl` is required for in-app WebView completion
+
 ## 1.0.3
 
 - Add `CheckoutOpenMode.inAppWebView` — load hosted checkout in a full-screen WebView

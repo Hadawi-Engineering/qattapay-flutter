@@ -4,7 +4,7 @@ Official [QattaPay](https://qatta.sa) SDK for Flutter — add group contribution
 
 ```yaml
 dependencies:
-  qattapay_flutter: ^1.0.0
+  qattapay_flutter: ^1.0.4
 ```
 
 QattaPay lets groups of people split the cost of a purchase. This package handles:
@@ -48,7 +48,7 @@ external browser / Custom Tabs / SFSafariViewController) is supported.
 
 ```yaml
 dependencies:
-  qattapay_flutter: ^1.0.0
+  qattapay_flutter: ^1.0.4
 ```
 
 ```bash
@@ -162,7 +162,7 @@ Host fallback when using `mode`: `qatta.sa` → `hadawi.sa` (same as the Node / 
 | `locale` | `en`, `ar` |
 | `showBadge` / `showIcon` | booleans |
 | `openMode` | `inAppWebView` (default) or `externalBrowser` |
-| `returnUrl` | deep link / https URL appended to hosted checkout |
+| `returnUrl` | deep link / https URL — hosted checkout redirects here after success with `intentId`, `sessionId`, `status` (required for in-app WebView completion) |
 
 Imperative open:
 
@@ -176,6 +176,11 @@ await checkout.open(
   onSuccess: (data) {},
 );
 ```
+
+After payment, hosted checkout navigates to your `returnUrl` with
+`intentId`, `sessionId`, and `status=success|cancel|failed`. The in-app
+WebView intercepts that navigation (and a `qattapay:success` bridge backup)
+and closes, calling `onSuccess` / `onCancel`.
 
 ---
 
