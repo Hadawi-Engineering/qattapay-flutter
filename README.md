@@ -38,7 +38,9 @@ QattaPayButton ──POST /intent──►  QattaPayClient.intents.create ──
 
 **Never put your merchant API key or webhook secret in the mobile app.** Create intents on your server (Node, Laravel, Dart Frog, etc.), then pass only the `intentId` to Flutter.
 
-Checkout is the **hosted web flow**. Do not embed it in a framed WebView — the payment page sends `X-Frame-Options: deny` and will not render inside a frame. The SDK opens Custom Tabs / SFSafariViewController / the external browser via `url_launcher`.
+Checkout is the **hosted web flow**. Do **not** embed it in an HTML iframe —
+framing is blocked. Loading checkout as a **full-page in-app WebView** (or
+external browser / Custom Tabs / SFSafariViewController) is supported.
 
 ---
 
@@ -104,12 +106,14 @@ QattaPayButton(
   variant: QattaPayButtonVariant.primary,
   label: QattaPayButtonLabel.split,
   locale: QattaPayLocale.en,
+  openMode: CheckoutOpenMode.inAppWebView, // or externalBrowser
   getIntentId: () async {
     final res = await http.post(Uri.parse('https://api.my-store.com/qattapay/intent'));
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     return data['intentId'] as String;
   },
   returnUrl: Uri.parse('myapp://thank-you'),
+  onSuccess: (data) => debugPrint('done ${data.intentId}'),
   onError: (err) => debugPrint('QattaPay error: $err'),
 )
 ```
@@ -157,13 +161,20 @@ Host fallback when using `mode`: `qatta.sa` → `hadawi.sa` (same as the Node / 
 | `label` | `split`, `splitCart`, `pay` (or `labelText`) |
 | `locale` | `en`, `ar` |
 | `showBadge` / `showIcon` | booleans |
+| `openMode` | `inAppWebView` (default) or `externalBrowser` |
 | `returnUrl` | deep link / https URL appended to hosted checkout |
 
 Imperative open:
 
 ```dart
 final checkout = QattaPayCheckout(mode: QattaPayMode.live);
-await checkout.open(intentId, returnUrl: Uri.parse('myapp://thank-you'));
+await checkout.open(
+  intentId,
+  context: context, // required for inAppWebView
+  mode: CheckoutOpenMode.inAppWebView,
+  returnUrl: Uri.parse('myapp://thank-you'),
+  onSuccess: (data) {},
+);
 ```
 
 ---

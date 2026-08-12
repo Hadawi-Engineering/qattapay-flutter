@@ -8,6 +8,7 @@ library;
 
 export 'src/checkout/qattapay_button.dart';
 export 'src/checkout/qattapay_checkout.dart';
+export 'src/checkout/checkout_webview.dart';
 export 'src/client/qattapay_client.dart';
 export 'src/env/hosts.dart' show QattaPayMode;
 export 'src/exceptions/exceptions.dart';

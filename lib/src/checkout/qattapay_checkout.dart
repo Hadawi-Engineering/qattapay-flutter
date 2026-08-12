@@ -1,19 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../env/hosts.dart';
 import '../types/types.dart';
 import 'button_theme.dart';
+import 'checkout_webview.dart';
 
 /// Mobile-side QattaPay checkout controller.
 ///
-/// Opens the hosted web checkout. Do **not** embed checkout in a framed
-/// WebView — the payment page sends `X-Frame-Options: deny`.
+/// Opens the hosted web checkout as a **top-level** page (in-app WebView or
+/// external browser). Do **not** embed checkout inside an HTML iframe — the
+/// payment page blocks framing. A full-page WebView is fine.
 ///
 /// Prefer [QattaPayButton] for the storefront CTA.
 ///
 /// ```dart
 /// final checkout = QattaPayCheckout(mode: QattaPayMode.live);
-/// await checkout.open(intentId, returnUrl: Uri.parse('myapp://thank-you'));
+/// await checkout.open(
+///   intentId,
+///   context: context,
+///   mode: CheckoutOpenMode.inAppWebView,
+///   returnUrl: Uri.parse('myapp://thank-you'),
+/// );
 /// ```
 class QattaPayCheckout {
   QattaPayCheckout({
@@ -23,7 +31,7 @@ class QattaPayCheckout {
     if (mode == null && (baseUrl == null || baseUrl.isEmpty)) {
       throw ArgumentError(
         '[QattaPayCheckout] `mode` is required ("dev" | "live"). '
-        'Pass mode: QattaPayMode.dev for testing or QattaPayMode.live for production.',
+        'Pass mode: QattaPayMode.dev for testing or mode: QattaPayMode.live for production.',
       );
     }
   }
@@ -39,45 +47,68 @@ class QattaPayCheckout {
     );
   }
 
-  /// Open hosted checkout in an external browser / Custom Tabs /
-  /// SFSafariViewController.
+  /// Open hosted checkout.
   ///
-  /// Tries each configured host until one can be launched.
+  /// - [CheckoutOpenMode.inAppWebView] (default) — full-screen WebView inside
+  ///   your app. Requires [context].
+  /// - [CheckoutOpenMode.externalBrowser] — Safari / Custom Tabs / browser.
   Future<void> open(
     String intentId, {
-    CheckoutOpenMode mode = CheckoutOpenMode.externalBrowser,
+    BuildContext? context,
+    CheckoutOpenMode mode = CheckoutOpenMode.inAppWebView,
     Uri? returnUrl,
     LaunchMode launchMode = LaunchMode.externalApplication,
+    void Function(CheckoutSuccessData data)? onSuccess,
+    VoidCallback? onCancel,
   }) async {
-    if (mode != CheckoutOpenMode.externalBrowser) {
-      throw ArgumentError(
-        '[QattaPayCheckout] Unsupported mode "$mode". '
-        'Use CheckoutOpenMode.externalBrowser — WebView/iframe checkout is not supported.',
-      );
-    }
     if (intentId.isEmpty) {
       throw ArgumentError('[QattaPayCheckout] intentId must not be empty');
     }
 
-    Object? lastError;
-    for (final host in _hosts) {
-      final uri = buildCheckoutUri(
-        host: host,
-        intentId: intentId,
-        returnUrl: returnUrl,
-      );
-      try {
-        final ok = await launchUrl(uri, mode: launchMode);
-        if (ok) return;
-        lastError = StateError('launchUrl returned false for $uri');
-      } catch (err) {
-        lastError = err;
-      }
-    }
+    final uri = checkoutUrl(intentId, returnUrl: returnUrl);
 
-    throw StateError(
-      '[QattaPayCheckout] Unable to open checkout '
-      '(tried ${_hosts.length} host${_hosts.length > 1 ? 's' : ''}): $lastError',
-    );
+    switch (mode) {
+      case CheckoutOpenMode.inAppWebView:
+        if (context == null || !context.mounted) {
+          throw ArgumentError(
+            '[QattaPayCheckout] `context` is required for '
+            'CheckoutOpenMode.inAppWebView.',
+          );
+        }
+        await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => QattaPayCheckoutWebView(
+              checkoutUrl: uri,
+              intentId: intentId,
+              returnUrl: returnUrl,
+              onSuccess: onSuccess,
+              onCancel: onCancel,
+            ),
+          ),
+        );
+        return;
+
+      case CheckoutOpenMode.externalBrowser:
+        Object? lastError;
+        for (final host in _hosts) {
+          final hostUri = buildCheckoutUri(
+            host: host,
+            intentId: intentId,
+            returnUrl: returnUrl,
+          );
+          try {
+            final ok = await launchUrl(hostUri, mode: launchMode);
+            if (ok) return;
+            lastError = StateError('launchUrl returned false for $hostUri');
+          } catch (err) {
+            lastError = err;
+          }
+        }
+        throw StateError(
+          '[QattaPayCheckout] Unable to open checkout '
+          '(tried ${_hosts.length} host${_hosts.length > 1 ? 's' : ''}): $lastError',
+        );
+    }
   }
 }

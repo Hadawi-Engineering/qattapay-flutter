@@ -35,9 +35,12 @@ class QattaPayButton extends StatefulWidget {
     this.locale = QattaPayLocale.en,
     this.showBadge = true,
     this.showIcon = true,
+    this.openMode = CheckoutOpenMode.inAppWebView,
     this.returnUrl,
     this.enabled = true,
     this.onOpened,
+    this.onSuccess,
+    this.onCancel,
     this.onError,
     this.width = double.infinity,
   });
@@ -56,9 +59,20 @@ class QattaPayButton extends StatefulWidget {
   final QattaPayLocale locale;
   final bool showBadge;
   final bool showIcon;
+
+  /// How to present hosted checkout. Defaults to in-app WebView.
+  final CheckoutOpenMode openMode;
   final Uri? returnUrl;
   final bool enabled;
+
+  /// Fired after checkout is presented (WebView pushed / browser opened).
   final VoidCallback? onOpened;
+
+  /// Fired when [returnUrl] is reached inside the in-app WebView.
+  final void Function(CheckoutSuccessData data)? onSuccess;
+
+  /// Fired when the shopper closes the in-app WebView without completing.
+  final VoidCallback? onCancel;
   final void Function(Object error)? onError;
   final double? width;
 
@@ -81,7 +95,14 @@ class _QattaPayButtonState extends State<QattaPayButton> {
         mode: widget.mode,
         baseUrl: widget.baseUrl,
       );
-      await checkout.open(intentId, returnUrl: widget.returnUrl);
+      await checkout.open(
+        intentId,
+        context: context,
+        mode: widget.openMode,
+        returnUrl: widget.returnUrl,
+        onSuccess: widget.onSuccess,
+        onCancel: widget.onCancel,
+      );
       widget.onOpened?.call();
     } catch (err) {
       widget.onError?.call(err);

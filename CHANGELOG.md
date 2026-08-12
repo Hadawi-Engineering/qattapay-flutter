@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+- Add `CheckoutOpenMode.inAppWebView` — load hosted checkout in a full-screen WebView
+- Default button/checkout open mode is now in-app WebView (external browser still available)
+- Clarify that HTML iframe embedding is unsupported; top-level WebView is fine
+
 ## 1.0.2
 
 - Use the official QattaPay brand mark on `QattaPayButton` (bundled asset)

@@ -577,9 +577,12 @@ class QattaPayWebhookEvent {
 
 /// How the hosted checkout page is presented.
 ///
-/// WebView / iframe embedding is intentionally unsupported: the hosted
-/// payment page sends `X-Frame-Options: deny`.
+/// Do **not** embed checkout in an HTML iframe — framing is blocked.
+/// A full-page in-app WebView (top-level document) is supported.
 enum CheckoutOpenMode {
+  /// Full-screen WebView inside your Flutter app (recommended).
+  inAppWebView,
+
   /// Opens via Custom Tabs / SFSafariViewController / external browser.
   externalBrowser,
 }
