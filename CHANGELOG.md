@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Docs/comments: describe iframe blocking without naming the payment provider
+
 ## 1.0.0
 
 - Initial release of the official QattaPay Flutter SDK
