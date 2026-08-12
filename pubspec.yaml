@@ -1,6 +1,6 @@
 name: qattapay_flutter
 description: Official QattaPay Flutter SDK — group contribution checkout for Flutter apps.
-version: 1.0.1
+version: 1.0.2
 homepage: https://qatta.sa
 repository: https://github.com/Hadawi-Engineering/qattapay-flutter
 issue_tracker: https://github.com/Hadawi-Engineering/qattapay-flutter/issues
@@ -25,3 +25,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: false
+  assets:
+    - assets/brand/qatta-pay-icon.png

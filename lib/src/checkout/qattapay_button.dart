@@ -136,7 +136,7 @@ class _QattaPayButtonState extends State<QattaPayButton> {
                   )
                 else ...[
                   if (widget.showIcon) ...[
-                    _Logo(size: tokens.fontSize * 1.25, color: colors.foreground),
+                    _Logo(size: tokens.fontSize * 1.25),
                     const SizedBox(width: 8),
                   ],
                   Flexible(
@@ -185,10 +185,7 @@ class _QattaPayButtonState extends State<QattaPayButton> {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const _Logo(
-                    size: 14,
-                    color: Color(0xFF454C80),
-                  ),
+                  const _Logo(size: 14),
                   const SizedBox(width: 4),
                   const Text(
                     'QattaPay',
@@ -280,61 +277,35 @@ _ButtonColors _colorsFor(QattaPayButtonVariant variant) {
   }
 }
 
-/// Simple people / brand mark used when the remote SVG cannot be loaded.
+/// Official QattaPay logo — bundled asset with network fallback.
 class _Logo extends StatelessWidget {
-  const _Logo({required this.size, required this.color});
+  const _Logo({required this.size});
 
   final double size;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: _PeopleIconPainter(color),
+      child: Image.asset(
+        kQattaPayLogoAsset,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (_, __, ___) => Image.network(
+          kQattaPayLogoUrl,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => Icon(
+            Icons.groups_rounded,
+            size: size,
+            color: const Color(0xFF454C80),
+          ),
+        ),
       ),
     );
   }
-}
-
-class _PeopleIconPainter extends CustomPainter {
-  _PeopleIconPainter(this.color);
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final w = size.width;
-    final h = size.height;
-
-    // Left person
-    canvas.drawCircle(Offset(w * 0.32, h * 0.32), w * 0.16, paint);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(w * 0.12, h * 0.52, w * 0.4, h * 0.4),
-        Radius.circular(w * 0.12),
-      ),
-      paint,
-    );
-
-    // Right person (slightly smaller / offset)
-    canvas.drawCircle(Offset(w * 0.68, h * 0.28), w * 0.14, paint);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(w * 0.5, h * 0.48, w * 0.38, h * 0.42),
-        Radius.circular(w * 0.1),
-      ),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _PeopleIconPainter oldDelegate) =>
-      oldDelegate.color != color;
 }

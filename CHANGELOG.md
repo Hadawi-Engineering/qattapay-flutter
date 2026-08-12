@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Use the official QattaPay brand mark on `QattaPayButton` (bundled asset)
+
 ## 1.0.1
 
 - Docs/comments: describe iframe blocking without naming the payment provider

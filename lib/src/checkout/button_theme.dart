@@ -1,7 +1,10 @@
 import '../env/hosts.dart';
 import '../types/types.dart';
 
-const String kQattaPayLogoUrl = 'https://qatta.sa/brand/qatta-pay-icon.svg';
+/// Official QattaPay brand mark asset (packaged with the SDK).
+const String kQattaPayLogoAsset = 'packages/qattapay_flutter/assets/brand/qatta-pay-icon.png';
+
+const String kQattaPayLogoUrl = 'https://qatta.sa/brand/qatta-pay-icon.png';
 
 const Map<QattaPayLocale, Map<String, String>> kButtonLabels = {
   QattaPayLocale.en: {
