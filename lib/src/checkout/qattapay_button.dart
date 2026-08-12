@@ -91,6 +91,7 @@ class _QattaPayButtonState extends State<QattaPayButton> {
       if (intentId.isEmpty) {
         throw StateError('getIntentId returned an empty intent id');
       }
+      if (!mounted) return;
       final checkout = QattaPayCheckout(
         mode: widget.mode,
         baseUrl: widget.baseUrl,
