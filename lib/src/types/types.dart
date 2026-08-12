@@ -577,7 +577,7 @@ class QattaPayWebhookEvent {
 
 /// How the hosted checkout page is presented.
 ///
-/// WebView / iframe embedding is intentionally unsupported: ClickPay's hosted
+/// WebView / iframe embedding is intentionally unsupported: the hosted
 /// payment page sends `X-Frame-Options: deny`.
 enum CheckoutOpenMode {
   /// Opens via Custom Tabs / SFSafariViewController / external browser.

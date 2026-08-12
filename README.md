@@ -38,7 +38,7 @@ QattaPayButton ──POST /intent──►  QattaPayClient.intents.create ──
 
 **Never put your merchant API key or webhook secret in the mobile app.** Create intents on your server (Node, Laravel, Dart Frog, etc.), then pass only the `intentId` to Flutter.
 
-Checkout is the **hosted web flow**. Do not embed it in a framed WebView — ClickPay sends `X-Frame-Options: deny`. The SDK opens Custom Tabs / SFSafariViewController / the external browser via `url_launcher`.
+Checkout is the **hosted web flow**. Do not embed it in a framed WebView — the payment page sends `X-Frame-Options: deny` and will not render inside a frame. The SDK opens Custom Tabs / SFSafariViewController / the external browser via `url_launcher`.
 
 ---
 

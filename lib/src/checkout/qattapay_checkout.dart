@@ -7,7 +7,7 @@ import 'button_theme.dart';
 /// Mobile-side QattaPay checkout controller.
 ///
 /// Opens the hosted web checkout. Do **not** embed checkout in a framed
-/// WebView — ClickPay sends `X-Frame-Options: deny`.
+/// WebView — the payment page sends `X-Frame-Options: deny`.
 ///
 /// Prefer [QattaPayButton] for the storefront CTA.
 ///
