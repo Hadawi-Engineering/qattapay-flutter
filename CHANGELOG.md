@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add `SplitMode.byProduct` (pay by product) and `ContributionInvitation.assignedItems`.
+  The organizer assigns each item to one person at hosted checkout; no app changes
+  are needed to offer it.
+
 ## 1.0.4
 
 - Hosted checkout return-to-merchant: WebView completes on `returnUrl` navigation

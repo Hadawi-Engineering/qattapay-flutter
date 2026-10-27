@@ -152,6 +152,26 @@ Config: `apiKey`, `mode` (`dev` \| `live`), optional `baseUrl` (disables host fa
 
 Host fallback when using `mode`: `qatta.sa` → `hadawi.sa` (same as the Node / Laravel SDKs).
 
+### Split modes
+
+The organizer picks how the group splits the total on the hosted checkout (shown in the in-app WebView) — nothing extra to pass when creating the intent. `SplitMode` is `equal`, `flexible` or `byProduct`:
+
+- **`byProduct`** — the organizer assigns each item to one person; each pays for their items plus an equal share of anything beyond the items. Offered for carts with 2+ items; sessions are invite-only.
+
+On an order from `client.orders.get(...)`, `detail.order.session?.splitMode == SplitMode.byProduct` and each contribution's `invitation.assignedItems` lists the indexes into `session.itemSnapshot` that person paid for:
+
+```dart
+final detail = await client.orders.get(orderId);
+final session = detail.order.session;
+if (session?.splitMode == SplitMode.byProduct) {
+  for (final c in detail.contributions) {
+    final names = (c.invitation.assignedItems ?? [])
+        .map((i) => session!.itemSnapshot[i].name);
+    print('${c.invitation.inviteePhone} paid for ${names.join(', ')}');
+  }
+}
+```
+
 ### `QattaPayButton` / `QattaPayCheckout` (mobile)
 
 | Option | Values |
