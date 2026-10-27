@@ -99,6 +99,62 @@ void main() {
       expect(detail.order.id, 'ord_1');
       expect(detail.order.status, OrderStatus.funded);
     });
+
+    test('SplitMode parses byProduct', () {
+      expect(SplitMode.tryParse('byProduct'), SplitMode.byProduct);
+      expect(SplitMode.tryParse('equal'), SplitMode.equal);
+      expect(SplitMode.tryParse('flexible'), SplitMode.flexible);
+      expect(SplitMode.tryParse('nope'), isNull);
+    });
+
+    test('pay-by-product order exposes assignedItems per contributor', () {
+      final detail = OrderDetail.fromJson({
+        'order': {
+          'id': 'ord_1',
+          'sessionId': 'ses_1',
+          'merchantId': 'mer_1',
+          'status': 'funded',
+          'settlementAmount': 1000,
+          'createdAt': '2026-01-01T00:00:00.000Z',
+          'updatedAt': '2026-01-01T00:00:00.000Z',
+          'session': {
+            'totalAmount': 235000,
+            'collectedAmount': 235000,
+            'itemSnapshot': [
+              {'name': 'Watch', 'price': 150000},
+              {'name': 'Perfume', 'price': 85000},
+            ],
+            'deadline': '2026-01-02T00:00:00.000Z',
+            'status': 'funded',
+            'splitMode': 'byProduct',
+          },
+        },
+        'contributions': [
+          {
+            'id': 'c1',
+            'amount': 85000,
+            'paymentStatus': 'captured',
+            'createdAt': '2026-01-01T00:00:00.000Z',
+            'invitation': {
+              'inviteePhone': '+966500000001',
+              'assignedAmount': 85000,
+              'assignedItems': [1],
+            },
+          },
+          {
+            'id': 'c2',
+            'amount': 150000,
+            'paymentStatus': 'captured',
+            'createdAt': '2026-01-01T00:00:00.000Z',
+            'invitation': {'assignedAmount': 150000},
+          },
+        ],
+      });
+      expect(detail.order.session?.splitMode, SplitMode.byProduct);
+      expect(detail.contributions[0].invitation.assignedItems, [1]);
+      // Other split modes carry no assignedItems.
+      expect(detail.contributions[1].invitation.assignedItems, isNull);
+    });
   });
 }
 

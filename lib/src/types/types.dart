@@ -49,9 +49,14 @@ enum SessionStatus {
   }
 }
 
+/// How the group splits the total.
+///
+/// [byProduct]: the organizer assigns each item to one person; each pays for
+/// their items plus an equal share of anything the total carries beyond the items.
 enum SplitMode {
   equal,
-  flexible;
+  flexible,
+  byProduct;
 
   static SplitMode? tryParse(String? value) {
     switch (value) {
@@ -59,6 +64,8 @@ enum SplitMode {
         return SplitMode.equal;
       case 'flexible':
         return SplitMode.flexible;
+      case 'byProduct':
+        return SplitMode.byProduct;
       default:
         return null;
     }
@@ -437,17 +444,25 @@ class ContributionInvitation {
     this.inviteePhone,
     this.inviteeEmail,
     this.assignedAmount,
+    this.assignedItems,
   });
 
   final String? inviteePhone;
   final String? inviteeEmail;
   final int? assignedAmount;
 
+  /// [SplitMode.byProduct] sessions: indexes into the session's `itemSnapshot`
+  /// this contributor pays for.
+  final List<int>? assignedItems;
+
   factory ContributionInvitation.fromJson(JsonMap json) =>
       ContributionInvitation(
         inviteePhone: json['inviteePhone'] as String?,
         inviteeEmail: json['inviteeEmail'] as String?,
         assignedAmount: (json['assignedAmount'] as num?)?.toInt(),
+        assignedItems: (json['assignedItems'] as List<dynamic>?)
+            ?.map((e) => (e as num).toInt())
+            .toList(),
       );
 }
 
