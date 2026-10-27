@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0
 
 - Add `SplitMode.byProduct` (pay by product) and `ContributionInvitation.assignedItems`.
   The organizer assigns each item to one person at hosted checkout; no app changes
