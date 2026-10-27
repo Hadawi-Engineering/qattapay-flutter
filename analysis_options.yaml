@@ -11,3 +11,7 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
+  # Newer Flutter adds this itself during `flutter pub get`, which dirties the
+  # checkout and fails `dart pub publish --dry-run` in CI. Keep it committed.
+  exclude:
+    - build/**
